@@ -10,7 +10,7 @@
 ![RDS](RDS.png)
 
 4. EC2-RDS接続
-![EC2-RDS connection](EC2-RDS connection.png)
+![EC2-RDS connection]("EC2-RDS connection.png")
 
 ## 感想
 - 詰まって、調べて、また詰まって、また調べて、結局作り直して、のループ。先が見えないのはツラい。
