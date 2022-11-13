@@ -9,7 +9,7 @@
 ![Step2.drawio](Step2.drawio.png)
 
 3. ELB追加
-![Step3_ALB](Step1_ALB.png)
+![Step3_ALB](Step3_ALB.png)
 ![Step3.drawio](Step3.drawio.png)
 
 4. S3追加
