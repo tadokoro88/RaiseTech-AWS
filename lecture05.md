@@ -2,19 +2,19 @@
 ## 課題
 1. 組み込みサーバーPumaのままデプロイ
 ![Step1_Puma](Step1_Puma.png)
-![Step1.drawio](Step1.drawio.png]
+![Step1.drawio](Step1.drawio.png)
 
 2. unicorn-Nginxでデプロイ
 ![Step2_Nginx](Step2_Nginx.png)
-![Step2.drawio](Step2.drawio.png]
+![Step2.drawio](Step2.drawio.png)
 
 3. ELB追加
 ![Step3_ALB](Step1_ALB.png)
-![Step3.drawio](Step3.drawio.png]
+![Step3.drawio](Step3.drawio.png)
 
 4. S3追加
 ![Step4_S3](Step4_S3.png)
-![Step4.drawio](Step4.drawio.png]
+![Step4.drawio](Step4.drawio.png)
 
 ## 感想
 - どのパッケージを選ぶかどう判断するかはまだ謎が残る。特に自動化の時にバージョンチェックを柔軟にできるのかイメージがつかない。
