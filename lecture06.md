@@ -1,23 +1,23 @@
 # 第6回 ロギング
 ## 課題
-1. CloudTrailでAdminのイベント履歴を確認
-ログインからCloudTrailで検索するまで
+1. CloudTrailでAdminのイベント履歴を確認  
+ログインからCloudTrailで検索するまで  
 ![CloudTrail](image/CloudTrail.png)
 
-2. CloudWatchアラームでメール通知
-unicornを止めるとAlarm
-![Alarm](image/CloudWatch%20alarm_Alarm.png)
+2. CloudWatchアラームでメール通知  
+unicornを止めるとAlarm  
+![Alarm](image/ClouldWatch%20alarm_Alarm.png)
 
-unicornを再度起動するとOK
+unicornを再度起動するとOK  
 ![OK](image/CloudWatch%20alarm_OK.png)
 
-3. AWS pricing calculatorで見積取得
-1ヶ月46.29 USD
-年間554.23 USD
-[見積リンク](https://calculator.aws/#/estimate?id=edf8d480d355c4f362fa29467cecfb3e2f87df41)
+3. AWS pricing calculatorで見積取得  
+1ヶ月46.29 USD  
+年間554.23 USD  
+[見積リンク](https://calculator.aws/#/estimate?id=edf8d480d355c4f362fa29467cecfb3e2f87df41)  
 
-4. Billingで請求書を確認
-全てFree tier枠内
+4. Billingで請求書を確認  
+全てFree tier枠内  
 ![Billing](image/Billing.png)
 
 ## 感想
