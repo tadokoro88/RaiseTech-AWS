@@ -1,20 +1,20 @@
 # 第5回 EC2上でアプリケーションをデプロイ
 ## 課題
 1. 組み込みサーバーPumaのままデプロイ
-![Step1_Puma](Step1_Puma.png)
-![Step1.drawio](Step1.drawio.png)
+![Step1_Puma](image/Step1_Puma.png)
+![Step1.drawio](image/Step1.drawio.png)
 
 2. unicorn-Nginxでデプロイ
-![Step2_Nginx](Step2_Nginx.png)
-![Step2.drawio](Step2.drawio.png)
+![Step2_Nginx](image/Step2_Nginx.png)
+![Step2.drawio](image/Step2.drawio.png)
 
 3. ELB追加
-![Step3_ALB](Step3_ALB.png)
-![Step3.drawio](Step3.drawio.png)
+![Step3_ALB](image/Step3_ALB.png)
+![Step3.drawio](image/Step3.drawio.png)
 
 4. S3追加
-![Step4_S3](Step4_S3.png)
-![Step4.drawio](Step4.drawio.png)
+![Step4_S3](image/Step4_S3.png)
+![Step4.drawio](image/Step4.drawio.png)
 
 ## 感想
 - どのパッケージを選ぶかどう判断するかはまだ謎が残る。特に自動化の時にバージョンチェックを柔軟にできるのかイメージがつかない。

@@ -5,15 +5,15 @@
 ![CloudTrail](image/CloudTrail.png)
 
 2. CloudWatchアラームでメール通知  
-unicornを止めるとAlarm  
+unicornを止めるとAlarm
 ![Alarm](image/ClouldWatch%20alarm_Alarm.png)
 
-unicornを再度起動するとOK  
+unicornを再度起動するとOK
 ![OK](image/CloudWatch%20alarm_OK.png)
 
 3. AWS pricing calculatorで見積取得  
-1ヶ月46.29 USD  
-年間554.23 USD  
+1ヶ月 46.29 USD  
+年間 554.23 USD  
 [見積リンク](https://calculator.aws/#/estimate?id=edf8d480d355c4f362fa29467cecfb3e2f87df41)  
 
 4. Billingで請求書を確認  
