@@ -1,16 +1,16 @@
 # 第4回講義
 ## 課題
 1. VPC作成
-![VPC](VPC.png)
+![VPC](image/VPC.png)
 
 2. EC2インスタンス作成
-![EC2](EC2.png)
+![EC2](image/EC2.png)
 
 3. RDS作成
-![RDS](RDS.png)
+![RDS](image/RDS.png)
 
 4. EC2-RDS接続
-![EC2-RDS connection](EC2-RDS.png)
+![EC2-RDS connection](image/EC2-RDS.png)
 
 ## 感想
 - 詰まって、調べて、また詰まって、また調べて、結局作り直して、のループ。先が見えないのはツラい。
