@@ -1,0 +1,471 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  CF VPC-EC-RDS-ELB-S3 for raisetechtakayuki
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: General
+        Parameters:
+          - PJName
+      - Label:
+          default: VPC setup
+        Parameters:
+          - VPCCIDR
+          - PublicSubnetACIDR
+          - PublicSubnetCCIDR
+          - PrivateSubnetACIDR
+          - PrivateSubnetCCIDR
+          - MyIP
+      - Label:
+          default: EC2 setup
+        Parameters:
+          - KeyName
+      - Label:
+          default: RDS setup
+        Parameters:
+          - RDSUserName
+          - RDSUserPassword
+
+Parameters:
+  PJName:
+    Description: Project name
+    Type: String
+
+  VPCCIDR:
+    Description: CIDR for VPC
+    Type: String
+    Default: 10.0.0.0/16
+
+  PublicSubnetACIDR:
+    Description: CIDR for public subnet a
+    Type: String
+    Default: 10.0.0.0/20
+
+  PublicSubnetCCIDR:
+    Description: CIDR for public subnet c
+    Type: String
+    Default: 10.0.16.0/20
+
+  PrivateSubnetACIDR:
+    Description: CIDR for private subnet a
+    Type: String
+    Default: 10.0.128.0/20
+
+  PrivateSubnetCCIDR:
+    Description: CIDR for private subnet c
+    Type: String
+    Default: 10.0.144.0/20
+
+  MyIP:
+    Description: CIDR allowed in security group (eg. 111.102.184.193/32)
+    Type: String
+
+  KeyName:
+    Description: Key name for EC2
+    Type: String
+
+  RDSUserName:
+    Description: User name for RDS
+    Type: String
+    Default: admin
+    NoEcho: true
+    AllowedPattern: "[a-zA-Z][a-zA-Z0-9]*"
+    ConstraintDescription: must begin with a letter and contain only alphanumeric characters.
+
+  RDSUserPassword:
+    Description: User password for RDS
+    Type: String
+    NoEcho: true
+    AllowedPattern: "[a-zA-Z0-9]*"
+    ConstraintDescription: must contain only alphanumeric characters.
+
+
+Resources:
+  # ====================
+  # VPC setup
+  # ====================
+  cfVPC:
+    Type: AWS::EC2::VPC
+    Properties: 
+      CidrBlock: !Ref VPCCIDR
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+      InstanceTenancy: default
+      Tags: 
+        - Key: Name
+          Value: !Sub "${PJName}-vpc"
+
+  cfIGW:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+      - Key: Name
+        Value: !Sub "${PJName}-igw"
+
+  AttachIGW:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref cfVPC
+      InternetGatewayId: !Ref cfIGW
+
+  # ====================
+  # Subnet creation
+  # ====================
+  cfPublicSubnetA:
+    Type: AWS::EC2::Subnet
+    Properties: 
+      AvailabilityZone: ap-northeast-1a
+      CidrBlock: !Ref PublicSubnetACIDR
+      Tags: 
+        - Key: Name
+          Value: !Sub "${PJName}-subnet-public-ap-northeast-1a"
+      VpcId: !Ref cfVPC
+
+  cfPublicSubnetC:
+    Type: AWS::EC2::Subnet
+    Properties: 
+      AvailabilityZone: ap-northeast-1c
+      CidrBlock: !Ref PublicSubnetCCIDR
+      Tags: 
+        - Key: Name
+          Value: !Sub "${PJName}-subnet-public-ap-northeast-1c"
+      VpcId: !Ref cfVPC
+
+  cfPrivateSubnetA:
+    Type: AWS::EC2::Subnet
+    Properties: 
+      AvailabilityZone: ap-northeast-1a
+      CidrBlock: !Ref PrivateSubnetACIDR
+      Tags: 
+        - Key: Name
+          Value: !Sub "${PJName}-subnet-private-ap-northeast-1a"
+      VpcId: !Ref cfVPC
+
+  cfPrivateSubnetC:
+    Type: AWS::EC2::Subnet
+    Properties: 
+      AvailabilityZone: ap-northeast-1c
+      CidrBlock: !Ref PrivateSubnetCCIDR
+      Tags: 
+        - Key: Name
+          Value: !Sub "${PJName}-subnet-private-ap-northeast-1c"
+      VpcId: !Ref cfVPC
+
+  # ====================
+  # RouteTable, Routing
+  # ====================
+  cfRouteTablePublic:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref cfVPC
+      Tags:
+        - Key: Name
+          Value: !Sub "${PJName}-rtb-public"
+
+  cfRouteTablePrivateA:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref cfVPC
+      Tags:
+        - Key: Name
+          Value: !Sub "${PJName}-rtb-private-ap-northeast-1a"
+
+  cfRouteTablePrivateC:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref cfVPC
+      Tags:
+        - Key: Name
+          Value: !Sub "${PJName}-rtb-private-ap-northeast-1c"
+
+  routePublic:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref cfRouteTablePublic
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref cfIGW
+
+  routeTableAssocPublicA:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref cfPublicSubnetA
+      RouteTableId: !Ref cfRouteTablePublic
+
+  routeTableAssocPublicC:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref cfPublicSubnetC
+      RouteTableId: !Ref cfRouteTablePublic
+
+  routeTableAssocPrivateA:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref cfPrivateSubnetA
+      RouteTableId: !Ref cfRouteTablePrivateA
+
+  routeTableAssocPrivateC:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref cfPrivateSubnetC
+      RouteTableId: !Ref cfRouteTablePrivateC
+
+  # ====================
+  # EC2 setup
+  # ====================
+  cfEC2SG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: cfsg-ec2
+      GroupDescription: cf security group for EC2
+      VpcId: !Ref cfVPC
+      SecurityGroupIngress:
+        # SSH
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: !Ref MyIP
+          Description: My IP for SSH
+        # HTTP
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: !Ref MyIP
+          Description: My IP for HTTP
+        # For Puma
+        - IpProtocol: tcp
+          FromPort: 3000
+          ToPort: 3000
+          CidrIp: !Ref MyIP
+          Description: My IP for Puma
+        # ELB HTTP
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          SourceSecurityGroupId: !Ref cfELBSG
+          Description: Allow access from ELB security group
+      Tags:
+        - Key: Name
+          Value: !Sub "${PJName}-ec2-sg"
+
+  cfEC2KeyPair:
+    Type: AWS::EC2::KeyPair
+    Properties:
+      KeyName: !Ref KeyName
+
+  cfEC2:
+    Type: AWS::EC2::Instance
+    Properties:
+      KeyName: !Ref cfEC2KeyPair
+      # Amazon Linux2
+      ImageId: ami-0de5311b2a443fb89
+      InstanceType: t2.micro
+      NetworkInterfaces: 
+        - AssociatePublicIpAddress: true
+          DeviceIndex: 0
+          SubnetId: !Ref cfPublicSubnetA
+          GroupSet:
+            - !Ref cfEC2SG
+      UserData: !Base64 |
+        #!/bin/bash
+        sudo yum udpate -y
+        sudo yum install git -y
+      IamInstanceProfile:
+        !Ref S3AccessInstanceProfile
+      Tags:
+        - Key: Name
+          Value: !Sub "${PJName}-ec2"
+
+  # ====================
+  # RDS setup
+  # ====================
+  cfRDSDB:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      AllocatedStorage: 20
+      DBInstanceClass: db.t3.micro
+      DBInstanceIdentifier: !Sub "${PJName}-rds"
+      DBSubnetGroupName: !Ref cfRDSSubnetGroup
+      Engine: mysql
+      EngineVersion: 8.0.30
+      AutoMinorVersionUpgrade: true
+      MasterUsername: !Ref RDSUserName
+      MasterUserPassword: !Ref RDSUserPassword
+      StorageEncrypted: true
+      CopyTagsToSnapshot: true
+      PubliclyAccessible: false
+      StorageType: gp2
+      VPCSecurityGroups:
+        - !Ref cfRDSSG
+      Tags:
+        - Key: Name
+          Value: !Sub "${PJName}-rds"
+
+  cfRDSSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: !Sub "${PJName} RDS subnet"
+      DBSubnetGroupName: !Sub "${PJName}-rds-subnet"
+      SubnetIds:
+        - !Ref cfPrivateSubnetA
+        - !Ref cfPrivateSubnetC
+      Tags:
+        - Key: Name
+          Value: !Sub "${PJName}-rds-subnet"
+
+  cfRDSSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: cfsg-rds
+      GroupDescription: cf security group for RDS
+      VpcId: !Ref cfVPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 3306
+          ToPort: 3306
+          SourceSecurityGroupId: !Ref cfEC2SG
+          Description: Allow access from EC2 security group
+      Tags:
+        - Key: Name
+          Value: !Sub "${PJName}-rds-sg"
+
+  # ====================
+  # ELB setup
+  # ====================
+  cfELBSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: cfsg-elb2
+      GroupDescription: cf security group for ELB
+      VpcId: !Ref cfVPC
+      SecurityGroupIngress:
+        # HTTP
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: !Ref MyIP
+          Description: My IP for HTTP
+      Tags:
+        - Key: Name
+          Value: !Sub "${PJName}-elb-sg"
+
+  cfELB: 
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties: 
+      Name: !Sub "${PJName}-elb"
+      Type: application
+      Scheme: internet-facing
+      IpAddressType: ipv4
+      LoadBalancerAttributes: 
+        - Key: deletion_protection.enabled
+          Value: false
+        - Key: idle_timeout.timeout_seconds
+          Value: 60
+        - Key: load_balancing.cross_zone.enabled
+          Value: true
+      SecurityGroups:
+        - !Ref cfELBSG
+      Subnets: 
+        - !Ref cfPublicSubnetA
+        - !Ref cfPublicSubnetC
+      Tags: 
+        - Key: Name
+          Value: !Sub "${PJName}-elb"
+
+  cfELBTG: 
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties: 
+      VpcId: !Ref cfVPC
+      Name: !Sub "${PJName}-elb-tg"
+      Protocol: HTTP
+      Port: 80
+      HealthCheckProtocol: HTTP
+      HealthCheckPath: /
+      HealthCheckPort: traffic-port
+      HealthyThresholdCount: 5
+      UnhealthyThresholdCount: 2
+      HealthCheckTimeoutSeconds: 5
+      HealthCheckIntervalSeconds: 30
+      Matcher: 
+        HttpCode: 200
+      Tags: 
+        - Key: Name
+          Value: !Sub "${PJName}-elb-tg"
+      TargetGroupAttributes: 
+        - Key: deregistration_delay.timeout_seconds
+          Value: 300
+        - Key: stickiness.enabled
+          Value: false
+        - Key: load_balancing.cross_zone.enabled
+          Value: use_load_balancer_configuration
+      Targets: 
+        - Id: !Ref cfEC2
+          Port: 80
+
+  ELBListener: 
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties: 
+      DefaultActions: 
+        - TargetGroupArn: !Ref cfELBTG
+          Type: forward
+      LoadBalancerArn: !Ref cfELB
+      Port: 80
+      Protocol: HTTP
+
+  # ====================
+  # S3 setup
+  # ====================
+  cfS3:
+    Type: AWS::S3::Bucket
+    Properties: 
+      AccessControl: Private
+      BucketName: !Sub "${PJName}-s3"
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      CorsConfiguration: 
+        CorsRules:
+          - AllowedHeaders:
+              - '*'
+            AllowedMethods:
+              - PUT
+              - POST
+              - DELETE
+            AllowedOrigins:
+              - !GetAtt cfELB.DNSName
+            Id: cfCORSRule1
+      Tags:
+        - Key: Name
+          Value: !Sub "${PJName}-s3"
+
+  S3AccessRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${PJName}-s3-accessrole"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement: 
+          - 
+            Effect: "Allow"
+            Principal: 
+              Service: 
+                - "ec2.amazonaws.com"
+            Action: 
+              - "sts:AssumeRole"
+      Path: "/"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+
+  S3AccessInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: "/"
+      Roles:
+      - !Ref S3AccessRole
+
+# ====================
+# Outputs - For !ImportValue
+# ====================
