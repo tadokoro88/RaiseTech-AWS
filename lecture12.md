@@ -1,4 +1,4 @@
-# 第12回 TerraformationとCI/CDツールCloudFormation
+# 第12回 TerraformとCI/CDツールCloudFormation
 ## 課題
 ### CircleCIサンプルコンフィグの導入
 config.ymlの差し替え、clouldformation/*.ymlのエラー解消後
