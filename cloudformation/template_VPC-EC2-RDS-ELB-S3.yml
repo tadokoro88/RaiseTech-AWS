@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: >-
-  CF VPC-EC-RDS-ELB-S3 for raisetechtakayuki
+  CF VPC-EC2-RDS-ELB-S3 for raisetechtakayuki
 
 Metadata:
   AWS::CloudFormation::Interface:
@@ -116,7 +116,7 @@ Resources:
   cfPublicSubnetA:
     Type: AWS::EC2::Subnet
     Properties: 
-      AvailabilityZone: ap-northeast-1a
+      AvailabilityZone: !Sub ${AWS::Region}a
       CidrBlock: !Ref PublicSubnetACIDR
       Tags: 
         - Key: Name
@@ -126,7 +126,7 @@ Resources:
   cfPublicSubnetC:
     Type: AWS::EC2::Subnet
     Properties: 
-      AvailabilityZone: ap-northeast-1c
+      AvailabilityZone: !Sub ${AWS::Region}c
       CidrBlock: !Ref PublicSubnetCCIDR
       Tags: 
         - Key: Name
@@ -136,7 +136,7 @@ Resources:
   cfPrivateSubnetA:
     Type: AWS::EC2::Subnet
     Properties: 
-      AvailabilityZone: ap-northeast-1a
+      AvailabilityZone: !Sub ${AWS::Region}a
       CidrBlock: !Ref PrivateSubnetACIDR
       Tags: 
         - Key: Name
@@ -146,7 +146,7 @@ Resources:
   cfPrivateSubnetC:
     Type: AWS::EC2::Subnet
     Properties: 
-      AvailabilityZone: ap-northeast-1c
+      AvailabilityZone: !Sub ${AWS::Region}c
       CidrBlock: !Ref PrivateSubnetCCIDR
       Tags: 
         - Key: Name
