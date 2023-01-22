@@ -1,0 +1,184 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  CF VPC-EC2 for Ansible target node
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: General
+        Parameters:
+          - PJName
+      - Label:
+          default: VPC setup
+        Parameters:
+          - VPCCIDR
+          - PublicSubnetACIDR
+          - MyIP
+      - Label:
+          default: EC2 setup
+        Parameters:
+          - KeyName
+
+Parameters:
+  PJName:
+    Description: Project name
+    Type: String
+
+  VPCCIDR:
+    Description: CIDR for VPC
+    Type: String
+    Default: 10.0.0.0/16
+
+  PublicSubnetACIDR:
+    Description: CIDR for public subnet a
+    Type: String
+    Default: 10.0.0.0/20
+
+  MyIP:
+    Description: CIDR allowed in security group (eg. 111.102.184.193/32)
+    Type: String
+
+  KeyName:
+    Description: Key name for EC2
+    Type: String
+
+Resources:
+  # ====================
+  # VPC setup
+  # ====================
+  cfVPC:
+    Type: AWS::EC2::VPC
+    Properties: 
+      CidrBlock: !Ref VPCCIDR
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+      InstanceTenancy: default
+      Tags: 
+        - Key: Name
+          Value: !Sub "${PJName}-vpc"
+
+  cfIGW:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+      - Key: Name
+        Value: !Sub "${PJName}-igw"
+
+  AttachIGW:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref cfVPC
+      InternetGatewayId: !Ref cfIGW
+
+  # ====================
+  # Subnet creation
+  # ====================
+  cfPublicSubnetA:
+    Type: AWS::EC2::Subnet
+    Properties: 
+      AvailabilityZone: !Sub ${AWS::Region}a
+      CidrBlock: !Ref PublicSubnetACIDR
+      Tags: 
+        - Key: Name
+          Value: !Sub "${PJName}-subnet-public-ap-northeast-1a"
+      VpcId: !Ref cfVPC
+
+  # ====================
+  # RouteTable, Routing
+  # ====================
+  cfRouteTablePublic:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref cfVPC
+      Tags:
+        - Key: Name
+          Value: !Sub "${PJName}-rtb-public"
+
+  routePublic:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref cfRouteTablePublic
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref cfIGW
+
+  routeTableAssocPublicA:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref cfPublicSubnetA
+      RouteTableId: !Ref cfRouteTablePublic
+
+  # ====================
+  # EC2 setup
+  # ====================
+  cfEC2SG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: cfsg-ec2
+      GroupDescription: cf security group for EC2
+      VpcId: !Ref cfVPC
+      SecurityGroupIngress:
+        # SSH
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: !Ref MyIP
+          Description: My IP for SSH
+        # HTTP
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: !Ref MyIP
+          Description: My IP for HTTP
+        # For Puma
+        - IpProtocol: tcp
+          FromPort: 3000
+          ToPort: 3000
+          CidrIp: !Ref MyIP
+          Description: My IP for Puma
+      Tags:
+        - Key: Name
+          Value: !Sub "${PJName}-ec2-sg"
+
+  cfEC2KeyPair:
+    Type: AWS::EC2::KeyPair
+    Properties:
+      KeyName: !Ref KeyName
+
+  cfEC2:
+    Type: AWS::EC2::Instance
+    Properties:
+      KeyName: !Ref cfEC2KeyPair
+      # Amazon Linux2
+      ImageId: ami-0de5311b2a443fb89
+      InstanceType: t2.micro
+      NetworkInterfaces: 
+        - AssociatePublicIpAddress: true
+          DeviceIndex: 0
+          SubnetId: !Ref cfPublicSubnetA
+          GroupSet:
+            - !Ref cfEC2SG
+      UserData: !Base64 |
+        #!/bin/bash
+        sudo yum udpate -y
+      Tags:
+        - Key: Name
+          Value: !Sub "${PJName}-ec2"
+
+  cfEC2EIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+      Tags:
+        - Key: Name
+          Value: !Sub "${PJName}-eip"
+
+  AssociateEIP:
+    Type: AWS::EC2::EIPAssociation
+    Properties:
+      AllocationId: !GetAtt cfEC2EIP.AllocationId
+      InstanceId: !Ref cfEC2
+
+# ====================
+# Outputs - For !ImportValue
+# ====================
