@@ -50,6 +50,5 @@ workflows:
       - cloudformation_deploy:
           requires: 
             - cfn-lint
-          context:
-            - lecture13
+          context: lecture13
           # Successfully checked Failed in CircleCI if no context!
