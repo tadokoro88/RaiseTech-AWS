@@ -60,7 +60,7 @@ workflows:
       - cfn-lint
   lecture13:
     jobs:
-      - cloudformation_deploy:
+      - cloudformation_deploy
           # context: lecture13
 
       # - cloudformation_deploy:
