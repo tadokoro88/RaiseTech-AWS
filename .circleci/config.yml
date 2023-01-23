@@ -43,28 +43,11 @@ jobs:
             --stack-name lecture13 \
             --template-file ./cloudformation/cfn_ansible.yml \
 
-  # cloudformation_deploy:
-  #   executor: aws-cloudformation/default
-  #   steps:
-  #     - checkout
-  #     - aws-cloudformation/deploy:
-  #         aws-access-key-id: AWS_ACCESS_KEY_ID
-  #         aws-secret-access-key: AWS_SECRET_ACCESS_KEY
-  #         aws-region: AWS_DEFAULT_REGION
-  #         stack-name: lecture13
-  #         template-file-path: cloudformation/cfn_ansible.yml
-
 workflows:
-  raisetech-sample:
-    jobs:
-      - cfn-lint
   lecture13:
     jobs:
-      - cloudformation_deploy
-          # context: lecture13
-
-      # - cloudformation_deploy:
-      #     requires:
-      #       - aws-cli
-      #     context:
-      #       - lecture13
+      - cfn-lint
+      - cloudformation_deploy:
+          requires: cfn-lint
+          context: lecture13
+          # Successfully checked Failed in CircleCI if no context!
