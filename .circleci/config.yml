@@ -42,7 +42,9 @@ jobs:
             --template-file ./cloudformation/cfn_ansible.yml \
 
   ansible_execute:
-    executor: ansible-playbook/default
+    executor: 
+      name: ansible-playbook/default
+      python-version: "3.11"
     steps:
       - checkout
       - ansible-playbook/install
@@ -62,4 +64,3 @@ workflows:
       - ansible_execute:
           requires:
             - cfn_execute
-            
