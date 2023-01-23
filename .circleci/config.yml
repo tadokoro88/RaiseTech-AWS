@@ -3,7 +3,6 @@ version: 2.1
 orbs:
   python: circleci/python@2.0.3
   aws-cli: circleci/aws-cli@3.1.4
-  aws-cloudformation: orbss/aws-cloudformation@0.1.6
 
 jobs:
   cfn-lint:
@@ -21,11 +20,6 @@ jobs:
     steps:
       - checkout
       - aws-cli/install
-
-  cloudformation_deploy:
-    executor: aws-cloudformation/default
-    steps:
-      - checkout
       - run:
           name: token
           command: |
@@ -41,12 +35,21 @@ jobs:
             export AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_SESSION_TOKEN
             # interact with AWS
             aws --no-cli-pager sts get-caller-identity
-      - aws-cloudformation/deploy:
-          aws-access-key-id: AWS_ACCESS_KEY_ID
-          aws-secret-access-key: AWS_SECRET_ACCESS_KEY
-          aws-region: AWS_DEFAULT_REGION
-          stack-name: lecture13
-          template-file-path: cloudformation/cfn_ansible.yml
+            # CloudFormation deploy
+            aws cloudformation deploy \
+            --stack-name lecture13 \
+            --template-file ./cloudformation/cfn_ansible.yml \
+
+  # cloudformation_deploy:
+  #   executor: aws-cloudformation/default
+  #   steps:
+  #     - checkout
+  #     - aws-cloudformation/deploy:
+  #         aws-access-key-id: AWS_ACCESS_KEY_ID
+  #         aws-secret-access-key: AWS_SECRET_ACCESS_KEY
+  #         aws-region: AWS_DEFAULT_REGION
+  #         stack-name: lecture13
+  #         template-file-path: cloudformation/cfn_ansible.yml
 
 workflows:
   raisetech-sample:
@@ -54,9 +57,11 @@ workflows:
       - cfn-lint
   lecture13:
     jobs:
-      - aws-cli_install
-      - cloudformation_deploy:
-          requires:
-            - aws-cli
-          context:
-            - lecture13
+      - aws-cli_install:
+          context: lecture13
+
+      # - cloudformation_deploy:
+      #     requires:
+      #       - aws-cli
+      #     context:
+      #       - lecture13
