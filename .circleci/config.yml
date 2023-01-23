@@ -59,3 +59,7 @@ workflows:
             - cfn-lint
           context: lecture13
           # Successfully checked Failed in CircleCI if no context!
+      - ansible_execute:
+          requires:
+            - cfn_execute
+            
