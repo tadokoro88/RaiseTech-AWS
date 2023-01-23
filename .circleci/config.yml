@@ -21,7 +21,7 @@ jobs:
       - checkout
       - aws-cli/install
       - run:
-          name: token
+          name: token and deploy
           command: |
             # use the OpenID Connect token to obtain AWS credentials
             read -r AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_SESSION_TOKEN \<<< \
@@ -35,9 +35,6 @@ jobs:
             export AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_SESSION_TOKEN
             # interact with AWS
             aws --no-cli-pager sts get-caller-identity
-      - run:
-          name: cfn deploy
-          command: |
             # CloudFormation deploy
             aws cloudformation deploy \
             --stack-name lecture13 \
