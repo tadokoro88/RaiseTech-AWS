@@ -45,10 +45,10 @@ jobs:
     executor: ansible-playbook/default
     steps:
       - checkout
-      - ansible-playbook/install
       - add_ssh_keys:
           fingerprints:
-            - "ae:d0:44:42:78:9e:a0:2a:d5:19:25:e5:6c:36:5f:6d"
+            - "${KEY_FINGERPRINT}"
+      - ansible-playbook/install
       - ansible-playbook/playbook:
           playbook: ./ansible/playbook.yml
           playbook-options: "-i ./ansible/inventory"
