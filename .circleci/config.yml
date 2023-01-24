@@ -47,7 +47,7 @@ jobs:
       - checkout
       - add_ssh_keys:
           fingerprints:
-            - ${KEY_FINGERPRINT}
+            - ae:d0:44:42:78:9e:a0:2a:d5:19:25:e5:6c:36:5f:6d
       - ansible-playbook/install
       - ansible-playbook/playbook:
           playbook: ./ansible/playbook.yml
