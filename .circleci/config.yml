@@ -56,7 +56,9 @@ jobs:
       #       ansible -i ansible/inventory --private-key ~/Documents/SE/RaiseTech/AWS-13/lecture13_target.pem -u ec2-user -m ping 54.249.136.97
       - ansible-playbook/playbook:
           playbook: ansible/playbook.yml
-          playbook-options: "-i ansible/inventory -u ec2-user"
+          playbook-options: "-i ansible/inventory"
+          # No need to even specify user if it's in ~/.ssh/config in local?
+          # playbook-options: "-i ansible/inventory -u ec2-user"
 
 workflows:
   lecture13:
@@ -70,4 +72,3 @@ workflows:
       - ansible_execute:
           requires:
             - cfn_execute
-          context: lecture13
