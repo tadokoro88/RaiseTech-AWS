@@ -62,7 +62,6 @@ jobs:
       - run:
           name: rake spec
           command: |
-            cd spec
             rake spec
 
 workflows:
