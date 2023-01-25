@@ -122,11 +122,9 @@ Resources:
         - IpProtocol: tcp
           FromPort: 22
           ToPort: 22
-          CidrIp: !Ref MyIP
-          Description: My IP for SSH
           # Open to all to connect from CircleCI
-          # CidrIp: 0.0.0.0/0
-          # Description: All IP for SSH
+          CidrIp: 0.0.0.0/0
+          Description: All IP for SSH
         # HTTP
         - IpProtocol: tcp
           FromPort: 80
