@@ -50,10 +50,10 @@ jobs:
           fingerprints:
             - ae:d0:44:42:78:9e:a0:2a:d5:19:25:e5:6c:36:5f:6d
             # Want this environment variance..
-      - run:
-          name: ansible ping
-          command: |
-            ansible -i ansible/inventory --private-key ~/Documents/SE/RaiseTech/AWS-13/lecture13_target.pem -u ec2-user -m ping 54.249.136.97
+      # - run:
+      #     name: ansible ping
+      #     command: |
+      #       ansible -i ansible/inventory --private-key ~/Documents/SE/RaiseTech/AWS-13/lecture13_target.pem -u ec2-user -m ping 54.249.136.97
       - ansible-playbook/playbook:
           playbook: ansible/playbook.yml
           playbook-options: "-i ansible/inventory -u ec2-user"
