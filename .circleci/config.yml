@@ -46,10 +46,10 @@ jobs:
     steps:
       - checkout
       - ansible-playbook/install
-      - add_ssh_keys:
-          fingerprints:
-            - ae:d0:44:42:78:9e:a0:2a:d5:19:25:e5:6c:36:5f:6d
-            # Want this environment variance..
+      # - add_ssh_keys:
+      #     fingerprints:
+      #       - ae:d0:44:42:78:9e:a0:2a:d5:19:25:e5:6c:36:5f:6d
+      #       # Want this environment variance..
       # - run:
       #     name: ansible ping
       #     command: |
