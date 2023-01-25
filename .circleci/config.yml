@@ -3,6 +3,7 @@ version: 2.1
 orbs:
   python: circleci/python@2.0.3
   aws-cli: circleci/aws-cli@3.1.4
+  ansible-playbook: orbss/ansible-playbook@0.0.5
 
 jobs:
   cfn-lint:
@@ -15,7 +16,7 @@ jobs:
           command: |
             cfn-lint -i W3002 -t cloudformation/*.yml
 
-  cfn_deploy:
+  cfn_execute:
     executor: aws-cli/default
     steps:
       - checkout
@@ -38,14 +39,30 @@ jobs:
             # CloudFormation deploy
             aws cloudformation deploy \
             --stack-name lecture13 \
-            --template-file ./cloudformation/cfn_ansible.yml \
+            --template-file cloudformation/cfn_ansible.yml \
+
+  ansible_execute:
+    executor: ansible-playbook/default
+    steps:
+      - checkout
+      - ansible-playbook/install
+      - add_ssh_keys:
+          fingerprints:
+            - "${KEY_FINGERPRINT}"
+      - ansible-playbook/playbook:
+          playbook: ansible/playbook.yml
+          playbook-options: "-i ansible/inventory -u ec2-user"
 
 workflows:
   lecture13:
     jobs:
       - cfn-lint
-      - cfn_deploy:
+      - cfn_execute:
           requires: 
             - cfn-lint
           context: lecture13
           # Successfully checked Failed in CircleCI if no context!
+      - ansible_execute:
+          requires:
+            - cfn_execute
+          context: lecture13
