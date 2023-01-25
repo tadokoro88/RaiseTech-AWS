@@ -55,11 +55,14 @@ jobs:
           playbook-options: "-i ansible/inventory -u ec2-user"
 
   serverspec_execute:
-    docker:
-      - image: 'cimg/base:stable'
+    executor: ruby/default
     steps:
       - checkout
-      - ruby/rspec-test
+      - ruby/install-deps
+      - run:
+          name: rake spec
+          command: |
+            rake spec
 
 workflows:
   lecture13:
