@@ -4,6 +4,7 @@ orbs:
   python: circleci/python@2.0.3
   aws-cli: circleci/aws-cli@3.1.4
   ansible-playbook: orbss/ansible-playbook@0.0.5
+  ruby: circleci/ruby@2.0.0
 
 jobs:
   cfn-lint:
@@ -53,6 +54,13 @@ jobs:
           playbook: ansible/playbook.yml
           playbook-options: "-i ansible/inventory -u ec2-user"
 
+  serverspec_execute:
+    docker:
+      - image: 'cimg/base:stable'
+    steps:
+      - checkout
+      - ruby/rspec-test
+
 workflows:
   lecture13:
     jobs:
@@ -61,8 +69,10 @@ workflows:
           requires: 
             - cfn-lint
           context: lecture13
-          # Successfully checked Failed in CircleCI if no context!
       - ansible_execute:
           requires:
             - cfn_execute
           context: lecture13
+      - serverspec_execute:
+          requires:
+            - ansible-execute
