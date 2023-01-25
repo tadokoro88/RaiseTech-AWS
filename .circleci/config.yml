@@ -63,7 +63,7 @@ jobs:
           name: rake spec
           command: |
             cd spec
-            bundle exec rake spec
+            rake spec
 
 workflows:
   lecture13:
