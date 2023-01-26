@@ -6,5 +6,6 @@ git_source(:github) {|repo_name| "https://github.com/#{repo_name}" }
 
 # gem "rails"
 gem "serverspec"
-gem "rake"
+gem "ed25519"
+gem "bcrypt_pbkdf"
 
