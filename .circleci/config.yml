@@ -58,13 +58,11 @@ jobs:
     executor: ruby/default
     steps:
       - checkout
-      - ruby/install-deps:
-          app-dir: spec
+      - ruby/install-deps
       - run:
           name: rake spec
           command: |
-            cd spec
-            rake spec
+            bundle exec rake spec
 
 workflows:
   lecture13:
