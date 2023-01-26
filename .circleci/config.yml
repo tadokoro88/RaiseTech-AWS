@@ -59,9 +59,11 @@ jobs:
     steps:
       - checkout
       - ruby/install-deps
+          app-dir: spec
       - run:
           name: rake spec
           command: |
+            cd spec
             rake spec
 
 workflows:
