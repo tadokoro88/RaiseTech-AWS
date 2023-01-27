@@ -58,7 +58,8 @@ jobs:
     executor: ruby/default
     steps:
       - checkout
-      - ruby/install-deps: serverspec
+      - ruby/install-deps: 
+          app-dir: serverspec
       - run:
           name: rake spec
           command: |
