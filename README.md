@@ -1,6 +1,18 @@
-# RaiseTech-AWS
+# RaiseTech AWSコース学習内容
+# 1. Ruby on Railsサンプルアプリケーションのデプロイ
 ## 概要
-- CircleCIで以下のWorkflowを実行するサンプルリポジトリです。
+- 名前と画像をリストアップするサンプルアプリケーションの環境を構築しました。
+- EC2でサンプルアプリケーションを作動。WebサーバーとしてNginx, APサーバーとしてunicornを使用しました。
+- DBはRDS for MySQL, 画像保存はS3, アクセスはELBを通す構成です。
+
+![Step4.drawio](lecture/image/Step4.drawio.png)
+![Step3_ALB](lecture/image/Step3_ALB.png)
+
+<br>
+
+# 2. CircleCIによるインフラ構築の自動化
+## 概要
+- CircleCIで以下のWorkflowを実行するリポジトリを作成しました。
 
 ## Workflow
 1. GitHubのリポジトリにコードをPush
@@ -9,6 +21,9 @@
     - CloudFormationでEC2を作成
     - AnsibleでEC2にGitをインストール
     - ServerSpecでGitのインストールをテスト
+
+## 構成図
+![drawio](lecture/image/lecture13-Step1.drawio.png)
 
 ## 環境
 ### aws-cli
@@ -24,5 +39,3 @@
     $ ruby -version  
     ruby 2.7.7p221 (2022-11-24 revision 168ec2b1e5) [x86_64-linux]
 
-## 構成図
-![drawio](image/lecture13-Step1.drawio.png)
